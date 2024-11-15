@@ -961,17 +961,19 @@ function dbg(...args) {
 // === Body ===
 
 var ASM_CONSTS = {
-  132900: () => { window.addEventListener('resize', function(){ Module.resize(); }, false); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('mousemove', Module.mouseMove, false); Module.canvas.addEventListener('mousedown', Module.mousePress, false); Module.canvas.addEventListener('mouseup', Module.mouseRelease, false); Module.canvas.addEventListener('wheel', Module.mouseWheel, false); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress, false); Module.canvas.addEventListener('keyup', Module.keyRelease, false); Module.canvas.addEventListener('keypress', Module.keyTyped, false); },  
- 133829: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
- 133903: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
- 133977: () => { requestAnimationFrame(Module.render) },  
- 134014: () => { return Module.canvas.clientWidth },  
- 134047: () => { return Module.canvas.clientHeight },  
- 134081: () => { const devicePixelRatio = window.devicePixelRatio || 1; Module.canvas.width = Module.canvas.clientWidth * devicePixelRatio; Module.canvas.height = Module.canvas.clientHeight * devicePixelRatio; },  
- 134274: () => { return Module.canvas.width },  
- 134301: () => { return Module.canvas.height },  
- 134329: () => { return Module.canvas.width },  
- 134356: () => { return Module.canvas.height }
+  132836: () => { window.addEventListener('resize', function(){ Module.resize(); }, false); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('mousemove', Module.mouseMove, false); Module.canvas.addEventListener('mousedown', Module.mousePress, false); Module.canvas.addEventListener('mouseup', Module.mouseRelease, false); Module.canvas.addEventListener('wheel', Module.mouseWheel, false); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress, false); Module.canvas.addEventListener('keyup', Module.keyRelease, false); Module.canvas.addEventListener('keypress', Module.keyTyped, false); },  
+ 133765: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
+ 133839: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
+ 133913: () => { requestAnimationFrame(Module.render) },  
+ 133950: () => { return Module.canvas.clientWidth },  
+ 133983: () => { return Module.canvas.clientHeight },  
+ 134017: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
+ 134183: () => { return window.devicePixelRatio },  
+ 134214: () => { return Module.canvas.clientWidth },  
+ 134247: () => { return Module.canvas.clientHeight },  
+ 134281: () => { return Module.canvas.width },  
+ 134308: () => { return Module.canvas.height },  
+ 134336: () => { return window.devicePixelRatio }
 };
 function upload(accept_types,callback,callback_data) { globalThis["open_file"] = function(e) { const file_reader = new FileReader(); file_reader.onload = (event) => { const uint8Arr = new Uint8Array(event.target.result); const data_ptr = Module["_malloc"](uint8Arr.length); const data_on_heap = new Uint8Array(Module["HEAPU8"].buffer, data_ptr, uint8Arr.length); data_on_heap.set(uint8Arr); Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], [event.target.filename, event.target.mime_type, data_on_heap.byteOffset, uint8Arr.length, callback, callback_data]); Module["_free"](data_ptr); }; file_reader.filename = e.target.files[0].name; file_reader.mime_type = e.target.files[0].type; file_reader.readAsArrayBuffer(e.target.files[0]); }; var file_selector = document.createElement('input'); file_selector.setAttribute('type', 'file'); file_selector.setAttribute('onchange', 'globalThis["open_file"](event)'); file_selector.addEventListener('cancel', () => { Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], ["", "", 0, 0, callback, callback_data]); }); file_selector.setAttribute('accept', UTF8ToString(accept_types)); var is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); if (is_safari) { var dialog = document.createElement('dialog'); dialog.setAttribute('id', 'EmJsFileDialog'); var desc = document.createElement('p'); desc.innerText = 'Please choose a file. Allowed extension(s): ' + UTF8ToString(accept_types); dialog.appendChild(desc); file_selector.setAttribute('onclick', 'var dg = document.getElementById("EmJsFileDialog"); dg.close(); dg.remove()'); dialog.appendChild(file_selector); document.body.append(dialog); dialog.showModal(); } else { file_selector.click(); } }
 function download(filename,mime_type,buffer,buffer_size) { var a = document.createElement('a'); a.download = UTF8ToString(filename); a.href = URL.createObjectURL(new Blob([new Uint8Array(Module["HEAPU8"].buffer, buffer, buffer_size)], {type: UTF8ToString(mime_type)})); a.click(); }
@@ -6730,8 +6732,8 @@ var stackAlloc = createExportWrapper('stackAlloc');
 var _emscripten_stack_get_current = () => (_emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'])();
 var ___cxa_is_pointer_type = createExportWrapper('__cxa_is_pointer_type');
 var dynCall_jiji = Module['dynCall_jiji'] = createExportWrapper('dynCall_jiji');
-var ___start_em_js = Module['___start_em_js'] = 134384;
-var ___stop_em_js = Module['___stop_em_js'] = 136544;
+var ___start_em_js = Module['___start_em_js'] = 134367;
+var ___stop_em_js = Module['___stop_em_js'] = 136527;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===
