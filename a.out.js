@@ -17,6 +17,195 @@ var Module = typeof Module != 'undefined' ? Module : {};
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
 
+  if (!Module.expectedDataFileDownloads) {
+    Module.expectedDataFileDownloads = 0;
+  }
+
+  Module.expectedDataFileDownloads++;
+  (function() {
+    // Do not attempt to redownload the virtual filesystem data when in a pthread or a Wasm Worker context.
+    if (Module['ENVIRONMENT_IS_PTHREAD'] || Module['$ww']) return;
+    var loadPackage = function(metadata) {
+
+      var PACKAGE_PATH = '';
+      if (typeof window === 'object') {
+        PACKAGE_PATH = window['encodeURIComponent'](window.location.pathname.toString().substring(0, window.location.pathname.toString().lastIndexOf('/')) + '/');
+      } else if (typeof process === 'undefined' && typeof location !== 'undefined') {
+        // web worker
+        PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
+      }
+      var PACKAGE_NAME = 'a.out.data';
+      var REMOTE_PACKAGE_BASE = 'a.out.data';
+      if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
+        Module['locateFile'] = Module['locateFilePackage'];
+        err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
+      }
+      var REMOTE_PACKAGE_NAME = Module['locateFile'] ? Module['locateFile'](REMOTE_PACKAGE_BASE, '') : REMOTE_PACKAGE_BASE;
+var REMOTE_PACKAGE_SIZE = metadata['remote_package_size'];
+
+      function fetchRemotePackage(packageName, packageSize, callback, errback) {
+        if (typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node === 'string') {
+          require('fs').readFile(packageName, function(err, contents) {
+            if (err) {
+              errback(err);
+            } else {
+              callback(contents.buffer);
+            }
+          });
+          return;
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', packageName, true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onprogress = function(event) {
+          var url = packageName;
+          var size = packageSize;
+          if (event.total) size = event.total;
+          if (event.loaded) {
+            if (!xhr.addedTotal) {
+              xhr.addedTotal = true;
+              if (!Module.dataFileDownloads) Module.dataFileDownloads = {};
+              Module.dataFileDownloads[url] = {
+                loaded: event.loaded,
+                total: size
+              };
+            } else {
+              Module.dataFileDownloads[url].loaded = event.loaded;
+            }
+            var total = 0;
+            var loaded = 0;
+            var num = 0;
+            for (var download in Module.dataFileDownloads) {
+            var data = Module.dataFileDownloads[download];
+              total += data.total;
+              loaded += data.loaded;
+              num++;
+            }
+            total = Math.ceil(total * Module.expectedDataFileDownloads/num);
+            if (Module['setStatus']) Module['setStatus'](`Downloading data... (${loaded}/${total})`);
+          } else if (!Module.dataFileDownloads) {
+            if (Module['setStatus']) Module['setStatus']('Downloading data...');
+          }
+        };
+        xhr.onerror = function(event) {
+          throw new Error("NetworkError for: " + packageName);
+        }
+        xhr.onload = function(event) {
+          if (xhr.status == 200 || xhr.status == 304 || xhr.status == 206 || (xhr.status == 0 && xhr.response)) { // file URLs can return 0
+            var packageData = xhr.response;
+            callback(packageData);
+          } else {
+            throw new Error(xhr.statusText + " : " + xhr.responseURL);
+          }
+        };
+        xhr.send(null);
+      };
+
+      function handleError(error) {
+        console.error('package error:', error);
+      };
+
+      var fetchedCallback = null;
+      var fetched = Module['getPreloadedPackage'] ? Module['getPreloadedPackage'](REMOTE_PACKAGE_NAME, REMOTE_PACKAGE_SIZE) : null;
+
+      if (!fetched) fetchRemotePackage(REMOTE_PACKAGE_NAME, REMOTE_PACKAGE_SIZE, function(data) {
+        if (fetchedCallback) {
+          fetchedCallback(data);
+          fetchedCallback = null;
+        } else {
+          fetched = data;
+        }
+      }, handleError);
+
+    function runWithFS() {
+
+      function assert(check, msg) {
+        if (!check) throw msg + new Error().stack;
+      }
+Module['FS_createPath']("/", "assets", true, true);
+Module['FS_createPath']("/assets", "fonts", true, true);
+
+      /** @constructor */
+      function DataRequest(start, end, audio) {
+        this.start = start;
+        this.end = end;
+        this.audio = audio;
+      }
+      DataRequest.prototype = {
+        requests: {},
+        open: function(mode, name) {
+          this.name = name;
+          this.requests[name] = this;
+          Module['addRunDependency'](`fp ${this.name}`);
+        },
+        send: function() {},
+        onload: function() {
+          var byteArray = this.byteArray.subarray(this.start, this.end);
+          this.finish(byteArray);
+        },
+        finish: function(byteArray) {
+          var that = this;
+          // canOwn this data in the filesystem, it is a slide into the heap that will never change
+          Module['FS_createDataFile'](this.name, null, byteArray, true, true, true);
+          Module['removeRunDependency'](`fp ${that.name}`);
+          this.requests[this.name] = null;
+        }
+      };
+
+      var files = metadata['files'];
+      for (var i = 0; i < files.length; ++i) {
+        new DataRequest(files[i]['start'], files[i]['end'], files[i]['audio'] || 0).open('GET', files[i]['filename']);
+      }
+
+      function processPackageData(arrayBuffer) {
+        assert(arrayBuffer, 'Loading data file failed.');
+        assert(arrayBuffer.constructor.name === ArrayBuffer.name, 'bad input to processPackageData');
+        var byteArray = new Uint8Array(arrayBuffer);
+        var curr;
+        // Reuse the bytearray from the XHR as the source for file reads.
+          DataRequest.prototype.byteArray = byteArray;
+          var files = metadata['files'];
+          for (var i = 0; i < files.length; ++i) {
+            DataRequest.prototype.requests[files[i].filename].onload();
+          }          Module['removeRunDependency']('datafile_a.out.data');
+
+      };
+      Module['addRunDependency']('datafile_a.out.data');
+
+      if (!Module.preloadResults) Module.preloadResults = {};
+
+      Module.preloadResults[PACKAGE_NAME] = {fromCache: false};
+      if (fetched) {
+        processPackageData(fetched);
+        fetched = null;
+      } else {
+        fetchedCallback = processPackageData;
+      }
+
+    }
+    if (Module['calledRun']) {
+      runWithFS();
+    } else {
+      if (!Module['preRun']) Module['preRun'] = [];
+      Module["preRun"].push(runWithFS); // FS is not initialized yet, wait for it
+    }
+
+    }
+    loadPackage({"files": [{"filename": "/assets/fonts/OpenSans-Regular.ttf", "start": 0, "end": 130832}], "remote_package_size": 130832});
+
+  })();
+
+
+    // All the pre-js content up to here must remain later on, we need to run
+    // it.
+    if (Module['ENVIRONMENT_IS_PTHREAD'] || Module['$ww']) Module['preRun'] = [];
+    var necessaryPreJSTasks = Module['preRun'].slice();
+  
+    if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
+    necessaryPreJSTasks.forEach(function(task) {
+      if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
+    });
+  
 
 // Sometimes an existing Module object exists with properties
 // meant to overwrite the default module functionality. Here
@@ -340,6 +529,32 @@ if (typeof WebAssembly != 'object') {
   abort('no native wasm support detected');
 }
 
+// include: base64Utils.js
+// Converts a string of base64 into a byte array (Uint8Array).
+function intArrayFromBase64(s) {
+  if (typeof ENVIRONMENT_IS_NODE != 'undefined' && ENVIRONMENT_IS_NODE) {
+    var buf = Buffer.from(s, 'base64');
+    return new Uint8Array(buf.buffer, buf.byteOffset, buf.length);
+  }
+
+  var decoded = atob(s);
+  var bytes = new Uint8Array(decoded.length);
+  for (var i = 0 ; i < decoded.length ; ++i) {
+    bytes[i] = decoded.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// If filename is a base64 data URI, parses and returns data (Buffer on node,
+// Uint8Array otherwise). If filename is not a base64 data URI, returns undefined.
+function tryParseAsDataURI(filename) {
+  if (!isDataURI(filename)) {
+    return;
+  }
+
+  return intArrayFromBase64(filename.slice(dataURIPrefix.length));
+}
+// end include: base64Utils.js
 // Wasm globals
 
 var wasmMemory;
@@ -961,19 +1176,20 @@ function dbg(...args) {
 // === Body ===
 
 var ASM_CONSTS = {
-  132836: () => { window.addEventListener('resize', function(){ Module.resize(); }, false); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('mousemove', Module.mouseMove, false); Module.canvas.addEventListener('mousedown', Module.mousePress, false); Module.canvas.addEventListener('mouseup', Module.mouseRelease, false); Module.canvas.addEventListener('wheel', Module.mouseWheel, false); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress, false); Module.canvas.addEventListener('keyup', Module.keyRelease, false); Module.canvas.addEventListener('keypress', Module.keyTyped, false); },  
- 133765: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
- 133839: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
- 133913: () => { requestAnimationFrame(Module.render) },  
- 133950: () => { return Module.canvas.clientWidth },  
- 133983: () => { return Module.canvas.clientHeight },  
- 134017: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
- 134183: () => { return window.devicePixelRatio },  
- 134214: () => { return Module.canvas.clientWidth },  
- 134247: () => { return Module.canvas.clientHeight },  
- 134281: () => { return Module.canvas.width },  
- 134308: () => { return Module.canvas.height },  
- 134336: () => { return window.devicePixelRatio }
+  132980: () => { window.addEventListener('resize', function(){ Module.resize(); }, false); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('mousemove', Module.mouseMove, false); Module.canvas.addEventListener('mousedown', Module.mousePress, false); Module.canvas.addEventListener('mouseup', Module.mouseRelease, false); Module.canvas.addEventListener('wheel', Module.mouseWheel, false); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress, false); Module.canvas.addEventListener('keyup', Module.keyRelease, false); Module.canvas.addEventListener('keypress', Module.keyTyped, false); },  
+ 133909: () => { return window.devicePixelRatio },  
+ 133940: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
+ 134014: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
+ 134088: () => { requestAnimationFrame(Module.render) },  
+ 134125: () => { return Module.canvas.clientWidth },  
+ 134158: () => { return Module.canvas.clientHeight },  
+ 134192: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
+ 134358: () => { return window.devicePixelRatio },  
+ 134389: () => { return Module.canvas.clientWidth },  
+ 134422: () => { return Module.canvas.clientHeight },  
+ 134456: () => { return Module.canvas.width },  
+ 134483: () => { return Module.canvas.height },  
+ 134511: () => { return window.devicePixelRatio }
 };
 function upload(accept_types,callback,callback_data) { globalThis["open_file"] = function(e) { const file_reader = new FileReader(); file_reader.onload = (event) => { const uint8Arr = new Uint8Array(event.target.result); const data_ptr = Module["_malloc"](uint8Arr.length); const data_on_heap = new Uint8Array(Module["HEAPU8"].buffer, data_ptr, uint8Arr.length); data_on_heap.set(uint8Arr); Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], [event.target.filename, event.target.mime_type, data_on_heap.byteOffset, uint8Arr.length, callback, callback_data]); Module["_free"](data_ptr); }; file_reader.filename = e.target.files[0].name; file_reader.mime_type = e.target.files[0].type; file_reader.readAsArrayBuffer(e.target.files[0]); }; var file_selector = document.createElement('input'); file_selector.setAttribute('type', 'file'); file_selector.setAttribute('onchange', 'globalThis["open_file"](event)'); file_selector.addEventListener('cancel', () => { Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], ["", "", 0, 0, callback, callback_data]); }); file_selector.setAttribute('accept', UTF8ToString(accept_types)); var is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); if (is_safari) { var dialog = document.createElement('dialog'); dialog.setAttribute('id', 'EmJsFileDialog'); var desc = document.createElement('p'); desc.innerText = 'Please choose a file. Allowed extension(s): ' + UTF8ToString(accept_types); dialog.appendChild(desc); file_selector.setAttribute('onclick', 'var dg = document.getElementById("EmJsFileDialog"); dg.close(); dg.remove()'); dialog.appendChild(file_selector); document.body.append(dialog); dialog.showModal(); } else { file_selector.click(); } }
 function download(filename,mime_type,buffer,buffer_size) { var a = document.createElement('a'); a.download = UTF8ToString(filename); a.href = URL.createObjectURL(new Blob([new Uint8Array(Module["HEAPU8"].buffer, buffer, buffer_size)], {type: UTF8ToString(mime_type)})); a.click(); }
@@ -6413,6 +6629,7 @@ function download(filename,mime_type,buffer,buffer_size) { var a = document.crea
       quit_(1, e);
     };
 
+
   var getCFunc = (ident) => {
       var func = Module['_' + ident]; // closure exported function
       assert(func, 'Cannot call unknown function ' + ident + ', make sure it is exported');
@@ -6494,6 +6711,10 @@ function download(filename,mime_type,buffer,buffer_size) { var a = document.crea
       return ret;
     };
 
+
+
+  var FS_unlink = (path) => FS.unlink(path);
+
   var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
     if (!parent) {
       parent = this;  // root node sets parent to itself
@@ -6540,7 +6761,7 @@ function download(filename,mime_type,buffer,buffer_size) { var a = document.crea
   });
   FS.FSNode = FSNode;
   FS.createPreloadedFile = FS_createPreloadedFile;
-  FS.staticInit();;
+  FS.staticInit();Module["FS_createPath"] = FS.createPath;Module["FS_createDataFile"] = FS.createDataFile;Module["FS_createPreloadedFile"] = FS.createPreloadedFile;Module["FS_unlink"] = FS.unlink;Module["FS_createLazyFile"] = FS.createLazyFile;Module["FS_createDevice"] = FS.createDevice;;
 embind_init_charCodes();
 BindingError = Module['BindingError'] = class BindingError extends Error { constructor(message) { super(message); this.name = 'BindingError'; }};
 InternalError = Module['InternalError'] = class InternalError extends Error { constructor(message) { super(message); this.name = 'InternalError'; }};
@@ -6732,13 +6953,21 @@ var stackAlloc = createExportWrapper('stackAlloc');
 var _emscripten_stack_get_current = () => (_emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'])();
 var ___cxa_is_pointer_type = createExportWrapper('__cxa_is_pointer_type');
 var dynCall_jiji = Module['dynCall_jiji'] = createExportWrapper('dynCall_jiji');
-var ___start_em_js = Module['___start_em_js'] = 134367;
-var ___stop_em_js = Module['___stop_em_js'] = 136527;
+var ___start_em_js = Module['___start_em_js'] = 134542;
+var ___stop_em_js = Module['___stop_em_js'] = 136702;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===
 
+Module['addRunDependency'] = addRunDependency;
+Module['removeRunDependency'] = removeRunDependency;
+Module['FS_createPath'] = FS.createPath;
+Module['FS_createLazyFile'] = FS.createLazyFile;
+Module['FS_createDevice'] = FS.createDevice;
 Module['ccall'] = ccall;
+Module['FS_createPreloadedFile'] = FS.createPreloadedFile;
+Module['FS_createDataFile'] = FS.createDataFile;
+Module['FS_unlink'] = FS.unlink;
 var missingLibrarySymbols = [
   'writeI53ToI64Clamped',
   'writeI53ToI64Signaling',
@@ -6850,7 +7079,6 @@ var missingLibrarySymbols = [
   'setMainLoop',
   'getSocketFromFD',
   'getSocketAddress',
-  'FS_unlink',
   'FS_mkdirTree',
   '_setNetworkCallback',
   'emscriptenWebGLGetUniform',
@@ -6914,13 +7142,8 @@ var unexportedSymbols = [
   'addOnPreMain',
   'addOnExit',
   'addOnPostRun',
-  'addRunDependency',
-  'removeRunDependency',
   'FS_createFolder',
-  'FS_createPath',
-  'FS_createLazyFile',
   'FS_createLink',
-  'FS_createDevice',
   'FS_readFile',
   'out',
   'err',
@@ -7020,13 +7243,11 @@ var unexportedSymbols = [
   'wget',
   'SYSCALLS',
   'preloadPlugins',
-  'FS_createPreloadedFile',
   'FS_modeStringToFlags',
   'FS_getMode',
   'FS_stdin_getChar_buffer',
   'FS_stdin_getChar',
   'FS',
-  'FS_createDataFile',
   'MEMFS',
   'TTY',
   'PIPEFS',
