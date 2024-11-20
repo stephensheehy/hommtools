@@ -1176,20 +1176,25 @@ function dbg(...args) {
 // === Body ===
 
 var ASM_CONSTS = {
-  132980: () => { window.addEventListener('resize', function(){ Module.resize(); }, false); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('mousemove', Module.mouseMove, false); Module.canvas.addEventListener('mousedown', Module.mousePress, false); Module.canvas.addEventListener('mouseup', Module.mouseRelease, false); Module.canvas.addEventListener('wheel', Module.mouseWheel, false); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress, false); Module.canvas.addEventListener('keyup', Module.keyRelease, false); Module.canvas.addEventListener('keypress', Module.keyTyped, false); },  
- 133909: () => { return window.devicePixelRatio },  
- 133940: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
- 134014: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
- 134088: () => { requestAnimationFrame(Module.render) },  
- 134125: () => { return Module.canvas.clientWidth },  
- 134158: () => { return Module.canvas.clientHeight },  
- 134192: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
- 134358: () => { return window.devicePixelRatio },  
- 134389: () => { return Module.canvas.clientWidth },  
- 134422: () => { return Module.canvas.clientHeight },  
- 134456: () => { return Module.canvas.width },  
- 134483: () => { return Module.canvas.height },  
- 134511: () => { return window.devicePixelRatio }
+  133508: () => { window.addEventListener('resize', function(){ Module.resize(); }, false); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.unselectable = "on"; Module.canvas.onselectstart = function(){return false}; Module.canvas.style.userSelect = "none"; Module.canvas.style.MozUserSelect = "none"; Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('mousemove', Module.mouseMove, false); Module.canvas.addEventListener('mousedown', Module.mousePress, false); Module.canvas.addEventListener('mouseup', Module.mouseRelease, false); Module.canvas.addEventListener('wheel', Module.mouseWheel, false); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress, false); Module.canvas.addEventListener('keyup', Module.keyRelease, false); Module.canvas.addEventListener('keypress', Module.keyTyped, false); Module.canvas.addEventListener('touchstart', Module.touchOn, false); Module.canvas.addEventListener('touchmove', Module.touchOn, false); Module.canvas.addEventListener('touchend', Module.touchOff, false); Module.canvas.addEventListener('touchcancel', Module.touchOff, false); },  
+ 134889: () => { return window.devicePixelRatio },  
+ 134920: () => { return Date.now() },  
+ 134938: () => { requestAnimationFrame(Module.render) },  
+ 134975: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
+ 135049: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
+ 135123: () => { requestAnimationFrame(Module.render) },  
+ 135160: () => { return Date.now() },  
+ 135178: () => { return Module.canvas.clientWidth },  
+ 135211: () => { return Module.canvas.clientHeight },  
+ 135245: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
+ 135411: () => { return window.devicePixelRatio },  
+ 135442: () => { return Module.canvas.clientWidth },  
+ 135475: () => { return Module.canvas.clientHeight },  
+ 135509: () => { return Module.canvas.width },  
+ 135536: () => { return Module.canvas.height },  
+ 135564: () => { return window.devicePixelRatio },  
+ 135595: () => { if (Module.canvas.setCapture) Module.canvas.setCapture(); },  
+ 135657: () => { if (Module.canvas.releaseCapture) Module.canvas.releaseCapture(); }
 };
 function upload(accept_types,callback,callback_data) { globalThis["open_file"] = function(e) { const file_reader = new FileReader(); file_reader.onload = (event) => { const uint8Arr = new Uint8Array(event.target.result); const data_ptr = Module["_malloc"](uint8Arr.length); const data_on_heap = new Uint8Array(Module["HEAPU8"].buffer, data_ptr, uint8Arr.length); data_on_heap.set(uint8Arr); Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], [event.target.filename, event.target.mime_type, data_on_heap.byteOffset, uint8Arr.length, callback, callback_data]); Module["_free"](data_ptr); }; file_reader.filename = e.target.files[0].name; file_reader.mime_type = e.target.files[0].type; file_reader.readAsArrayBuffer(e.target.files[0]); }; var file_selector = document.createElement('input'); file_selector.setAttribute('type', 'file'); file_selector.setAttribute('onchange', 'globalThis["open_file"](event)'); file_selector.addEventListener('cancel', () => { Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], ["", "", 0, 0, callback, callback_data]); }); file_selector.setAttribute('accept', UTF8ToString(accept_types)); var is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); if (is_safari) { var dialog = document.createElement('dialog'); dialog.setAttribute('id', 'EmJsFileDialog'); var desc = document.createElement('p'); desc.innerText = 'Please choose a file. Allowed extension(s): ' + UTF8ToString(accept_types); dialog.appendChild(desc); file_selector.setAttribute('onclick', 'var dg = document.getElementById("EmJsFileDialog"); dg.close(); dg.remove()'); dialog.appendChild(file_selector); document.body.append(dialog); dialog.showModal(); } else { file_selector.click(); } }
 function download(filename,mime_type,buffer,buffer_size) { var a = document.createElement('a'); a.download = UTF8ToString(filename); a.href = URL.createObjectURL(new Blob([new Uint8Array(Module["HEAPU8"].buffer, buffer, buffer_size)], {type: UTF8ToString(mime_type)})); a.click(); }
@@ -1345,6 +1350,91 @@ function download(filename,mime_type,buffer,buffer_size) { var a = document.crea
     };
   var ___assert_fail = (condition, filename, line, func) => {
       abort(`Assertion failed: ${UTF8ToString(condition)}, at: ` + [filename ? UTF8ToString(filename) : 'unknown filename', line, func ? UTF8ToString(func) : 'unknown function']);
+    };
+
+  class ExceptionInfo {
+      // excPtr - Thrown object pointer to wrap. Metadata pointer is calculated from it.
+      constructor(excPtr) {
+        this.excPtr = excPtr;
+        this.ptr = excPtr - 24;
+      }
+  
+      set_type(type) {
+        HEAPU32[(((this.ptr)+(4))>>2)] = type;
+      }
+  
+      get_type() {
+        return HEAPU32[(((this.ptr)+(4))>>2)];
+      }
+  
+      set_destructor(destructor) {
+        HEAPU32[(((this.ptr)+(8))>>2)] = destructor;
+      }
+  
+      get_destructor() {
+        return HEAPU32[(((this.ptr)+(8))>>2)];
+      }
+  
+      set_caught(caught) {
+        caught = caught ? 1 : 0;
+        HEAP8[(this.ptr)+(12)] = caught;
+      }
+  
+      get_caught() {
+        return HEAP8[(this.ptr)+(12)] != 0;
+      }
+  
+      set_rethrown(rethrown) {
+        rethrown = rethrown ? 1 : 0;
+        HEAP8[(this.ptr)+(13)] = rethrown;
+      }
+  
+      get_rethrown() {
+        return HEAP8[(this.ptr)+(13)] != 0;
+      }
+  
+      // Initialize native structure fields. Should be called once after allocated.
+      init(type, destructor) {
+        this.set_adjusted_ptr(0);
+        this.set_type(type);
+        this.set_destructor(destructor);
+      }
+  
+      set_adjusted_ptr(adjustedPtr) {
+        HEAPU32[(((this.ptr)+(16))>>2)] = adjustedPtr;
+      }
+  
+      get_adjusted_ptr() {
+        return HEAPU32[(((this.ptr)+(16))>>2)];
+      }
+  
+      // Get pointer which is expected to be received by catch clause in C++ code. It may be adjusted
+      // when the pointer is casted to some of the exception object base classes (e.g. when virtual
+      // inheritance is used). When a pointer is thrown this method should return the thrown pointer
+      // itself.
+      get_exception_ptr() {
+        // Work around a fastcomp bug, this code is still included for some reason in a build without
+        // exceptions support.
+        var isPointer = ___cxa_is_pointer_type(this.get_type());
+        if (isPointer) {
+          return HEAPU32[((this.excPtr)>>2)];
+        }
+        var adjusted = this.get_adjusted_ptr();
+        if (adjusted !== 0) return adjusted;
+        return this.excPtr;
+      }
+    }
+  
+  var exceptionLast = 0;
+  
+  var uncaughtExceptionCount = 0;
+  var ___cxa_throw = (ptr, type, destructor) => {
+      var info = new ExceptionInfo(ptr);
+      // Initialize ExceptionInfo content after it was allocated in __cxa_allocate_exception.
+      info.init(type, destructor);
+      exceptionLast = ptr;
+      uncaughtExceptionCount++;
+      assert(false, 'Exception thrown, but exception catching is not enabled. Compile with -sNO_DISABLE_EXCEPTION_CATCHING or -sEXCEPTION_CATCHING_ALLOWED=[..] to catch.');
     };
 
   var PATH = {
@@ -5419,6 +5509,13 @@ function download(filename,mime_type,buffer,buffer_size) { var a = document.crea
       __emval_decref(handle);
     };
 
+  
+  var __emval_take_value = (type, arg) => {
+      type = requireRegisteredType(type, '_emval_take_value');
+      var v = type['readValueFromPointer'](arg);
+      return Emval.toHandle(v);
+    };
+
   var _abort = () => {
       abort('native code called abort()');
     };
@@ -6137,6 +6234,11 @@ function download(filename,mime_type,buffer,buffer_size) { var a = document.crea
   }
   }
 
+  var _getentropy = (buffer, size) => {
+      randomFill(HEAPU8.subarray(buffer, buffer + size));
+      return 0;
+    };
+
   var _glActiveTexture = (x0) => GLctx.activeTexture(x0);
 
   var _glAttachShader = (program, shader) => {
@@ -6779,6 +6881,8 @@ var wasmImports = {
   /** @export */
   __assert_fail: ___assert_fail,
   /** @export */
+  __cxa_throw: ___cxa_throw,
+  /** @export */
   __syscall_fcntl64: ___syscall_fcntl64,
   /** @export */
   __syscall_ioctl: ___syscall_ioctl,
@@ -6821,6 +6925,8 @@ var wasmImports = {
   /** @export */
   _emval_run_destructors: __emval_run_destructors,
   /** @export */
+  _emval_take_value: __emval_take_value,
+  /** @export */
   abort: _abort,
   /** @export */
   emscripten_asm_const_async_on_main_thread: _emscripten_asm_const_async_on_main_thread,
@@ -6856,6 +6962,8 @@ var wasmImports = {
   fd_seek: _fd_seek,
   /** @export */
   fd_write: _fd_write,
+  /** @export */
+  getentropy: _getentropy,
   /** @export */
   glActiveTexture: _glActiveTexture,
   /** @export */
@@ -6937,6 +7045,8 @@ var __Z10mouseWheelN10emscripten3valE = Module['__Z10mouseWheelN10emscripten3val
 var __Z8keyPressN10emscripten3valE = Module['__Z8keyPressN10emscripten3valE'] = createExportWrapper('_Z8keyPressN10emscripten3valE');
 var __Z10keyReleaseN10emscripten3valE = Module['__Z10keyReleaseN10emscripten3valE'] = createExportWrapper('_Z10keyReleaseN10emscripten3valE');
 var __Z8keyTypedN10emscripten3valE = Module['__Z8keyTypedN10emscripten3valE'] = createExportWrapper('_Z8keyTypedN10emscripten3valE');
+var __Z7touchOnN10emscripten3valE = Module['__Z7touchOnN10emscripten3valE'] = createExportWrapper('_Z7touchOnN10emscripten3valE');
+var __Z8touchOffN10emscripten3valE = Module['__Z8touchOffN10emscripten3valE'] = createExportWrapper('_Z8touchOffN10emscripten3valE');
 var _main = Module['_main'] = createExportWrapper('main');
 var _upload_file_return = Module['_upload_file_return'] = createExportWrapper('upload_file_return');
 var _fflush = createExportWrapper('fflush');
@@ -6953,8 +7063,8 @@ var stackAlloc = createExportWrapper('stackAlloc');
 var _emscripten_stack_get_current = () => (_emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'])();
 var ___cxa_is_pointer_type = createExportWrapper('__cxa_is_pointer_type');
 var dynCall_jiji = Module['dynCall_jiji'] = createExportWrapper('dynCall_jiji');
-var ___start_em_js = Module['___start_em_js'] = 134542;
-var ___stop_em_js = Module['___stop_em_js'] = 136702;
+var ___start_em_js = Module['___start_em_js'] = 135727;
+var ___stop_em_js = Module['___stop_em_js'] = 137887;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===
@@ -7073,7 +7183,6 @@ var missingLibrarySymbols = [
   'makePromise',
   'idsToPromises',
   'makePromiseCallback',
-  'ExceptionInfo',
   'findMatchingCatch',
   'Browser_asyncPrepareDataCounter',
   'setMainLoop',
@@ -7238,6 +7347,7 @@ var unexportedSymbols = [
   'uncaughtExceptionCount',
   'exceptionLast',
   'exceptionCaught',
+  'ExceptionInfo',
   'Browser',
   'getPreloadedImageData__data',
   'wget',
