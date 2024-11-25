@@ -1176,25 +1176,28 @@ function dbg(...args) {
 // === Body ===
 
 var ASM_CONSTS = {
-  133540: () => { window.addEventListener('resize', function(){ Module.resize(); }, false); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('pointermove', Module.mouseMove, false); Module.canvas.addEventListener('pointerdown', Module.mousePress, false); Module.canvas.addEventListener('pointerup', Module.mouseRelease, false); Module.canvas.addEventListener('wheel', Module.mouseWheel, false); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress, false); Module.canvas.addEventListener('keyup', Module.keyRelease, false); Module.canvas.addEventListener('keypress', Module.keyTyped, false); Module.canvas.addEventListener('touchstart', Module.touchOn, false); Module.canvas.addEventListener('touchmove', Module.touchOn, false); Module.canvas.addEventListener('touchend', Module.touchOff, false); Module.canvas.addEventListener('touchcancel', Module.touchOff, false); },  
- 134751: () => { return window.devicePixelRatio },  
- 134782: () => { return Date.now() },  
- 134800: () => { requestAnimationFrame(Module.render) },  
- 134837: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
- 134911: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
- 134985: () => { requestAnimationFrame(Module.render) },  
- 135022: () => { return Date.now() },  
- 135040: () => { return Module.canvas.clientWidth },  
- 135073: () => { return Module.canvas.clientHeight },  
- 135107: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
- 135273: () => { return window.devicePixelRatio },  
- 135304: () => { return Module.canvas.clientWidth },  
- 135337: () => { return Module.canvas.clientHeight },  
- 135371: () => { return Module.canvas.width },  
- 135398: () => { return Module.canvas.height },  
- 135426: () => { return window.devicePixelRatio },  
- 135457: ($0) => { if (Module.canvas.setPointerCapture) Module.canvas.setPointerCapture($0); },  
- 135535: ($0) => { if (Module.canvas.releasePointerCapture ) Module.canvas.releasePointerCapture($0); }
+  133636: () => { if (document.activeElement.id === "screenKeyboard") document.getElementById("screenKeyboard").blur(); },  
+ 133742: () => { var screenKeyboard = document.createElement("input"); document.body.appendChild(screenKeyboard); screenKeyboard.id = "screenKeyboard"; screenKeyboard.type = "text"; screenKeyboard.style = "position: absolute; top: -1000px; background-color: transparent; border: transparent; height:0px;"; screenKeyboard.maxlength = 256; screenKeyboard.autocomplete = "off"; screenKeyboard.autocorrect = "off"; screenKeyboard.autocapitalize = "off"; screenKeyboard.spellcheck = "false"; function handleScreenKeyboardReturn(event) { event.preventDefault(); Module.hideScreenKeyboard(); } document.getElementById("screenKeyboard").addEventListener('keydown', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyPress(event); } ); document.getElementById("screenKeyboard").addEventListener('keyup', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyRelease(event); } ); document.getElementById("screenKeyboard").addEventListener('keypress', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyTyped(event); } ); document.getElementById("screenKeyboard").addEventListener('focusout', handleScreenKeyboardReturn); window.addEventListener('resize', function() { Module.resize(); }); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('pointermove', Module.mouseMove); Module.canvas.addEventListener('pointerdown', Module.mousePress); Module.canvas.addEventListener('pointerup', Module.mouseRelease); Module.canvas.addEventListener('wheel', Module.mouseWheel); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress); Module.canvas.addEventListener('keyup', Module.keyRelease); Module.canvas.addEventListener('keypress', Module.keyTyped); Module.canvas.addEventListener('touchstart', Module.touchOn); Module.canvas.addEventListener('touchmove', Module.touchOn); Module.canvas.addEventListener('touchend', Module.touchOff); Module.canvas.addEventListener('touchcancel', Module.touchOff); },  
+ 136090: () => { return window.devicePixelRatio },  
+ 136121: () => { if (document.activeElement.id === "screenKeyboard") document.getElementById("screenKeyboard").blur(); },  
+ 136227: () => { return Date.now() },  
+ 136245: () => { requestAnimationFrame(Module.render) },  
+ 136282: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
+ 136356: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
+ 136430: () => { requestAnimationFrame(Module.render) },  
+ 136467: () => { return Date.now() },  
+ 136485: () => { return Module.canvas.clientWidth },  
+ 136518: () => { return Module.canvas.clientHeight },  
+ 136552: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
+ 136718: () => { return window.devicePixelRatio },  
+ 136749: () => { return Module.canvas.clientWidth },  
+ 136782: () => { return Module.canvas.clientHeight },  
+ 136816: () => { return Module.canvas.width },  
+ 136843: () => { return Module.canvas.height },  
+ 136871: () => { return window.devicePixelRatio },  
+ 136902: ($0) => { if (Module.canvas.setPointerCapture) Module.canvas.setPointerCapture($0); },  
+ 136980: ($0) => { if (Module.canvas.releasePointerCapture ) Module.canvas.releasePointerCapture($0); },  
+ 137067: () => { if (document.activeElement.id != "screenKeyboard") document.getElementById("screenKeyboard").focus(); }
 };
 function upload(accept_types,callback,callback_data) { globalThis["open_file"] = function(e) { const file_reader = new FileReader(); file_reader.onload = (event) => { const uint8Arr = new Uint8Array(event.target.result); const data_ptr = Module["_malloc"](uint8Arr.length); const data_on_heap = new Uint8Array(Module["HEAPU8"].buffer, data_ptr, uint8Arr.length); data_on_heap.set(uint8Arr); Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], [event.target.filename, event.target.mime_type, data_on_heap.byteOffset, uint8Arr.length, callback, callback_data]); Module["_free"](data_ptr); }; file_reader.filename = e.target.files[0].name; file_reader.mime_type = e.target.files[0].type; file_reader.readAsArrayBuffer(e.target.files[0]); }; var file_selector = document.createElement('input'); file_selector.setAttribute('type', 'file'); file_selector.setAttribute('onchange', 'globalThis["open_file"](event)'); file_selector.addEventListener('cancel', () => { Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], ["", "", 0, 0, callback, callback_data]); }); file_selector.setAttribute('accept', UTF8ToString(accept_types)); var is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); if (is_safari) { var dialog = document.createElement('dialog'); dialog.setAttribute('id', 'EmJsFileDialog'); var desc = document.createElement('p'); desc.innerText = 'Please choose a file. Allowed extension(s): ' + UTF8ToString(accept_types); dialog.appendChild(desc); file_selector.setAttribute('onclick', 'var dg = document.getElementById("EmJsFileDialog"); dg.close(); dg.remove()'); dialog.appendChild(file_selector); document.body.append(dialog); dialog.showModal(); } else { file_selector.click(); } }
 function download(filename,mime_type,buffer,buffer_size) { var a = document.createElement('a'); a.download = UTF8ToString(filename); a.href = URL.createObjectURL(new Blob([new Uint8Array(Module["HEAPU8"].buffer, buffer, buffer_size)], {type: UTF8ToString(mime_type)})); a.click(); }
@@ -7063,8 +7066,8 @@ var stackAlloc = createExportWrapper('stackAlloc');
 var _emscripten_stack_get_current = () => (_emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'])();
 var ___cxa_is_pointer_type = createExportWrapper('__cxa_is_pointer_type');
 var dynCall_jiji = Module['dynCall_jiji'] = createExportWrapper('dynCall_jiji');
-var ___start_em_js = Module['___start_em_js'] = 135622;
-var ___stop_em_js = Module['___stop_em_js'] = 137782;
+var ___start_em_js = Module['___start_em_js'] = 137173;
+var ___stop_em_js = Module['___stop_em_js'] = 139333;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===
