@@ -27,7 +27,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: C:\Users\thats\AppData\Local\Temp\tmpkhzpu02z.js
+// include: C:\Users\thats\AppData\Local\Temp\tmphpuh45x5.js
 
   Module['expectedDataFileDownloads'] ??= 0;
   Module['expectedDataFileDownloads']++;
@@ -209,21 +209,21 @@ Module['FS_createPath']("/assets", "fonts", true, true);
 
   })();
 
-// end include: C:\Users\thats\AppData\Local\Temp\tmpkhzpu02z.js
-// include: C:\Users\thats\AppData\Local\Temp\tmp1vdspc7y.js
+// end include: C:\Users\thats\AppData\Local\Temp\tmphpuh45x5.js
+// include: C:\Users\thats\AppData\Local\Temp\tmpjoh03jq_.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: C:\Users\thats\AppData\Local\Temp\tmp1vdspc7y.js
-// include: C:\Users\thats\AppData\Local\Temp\tmp5r_7djfe.js
+  // end include: C:\Users\thats\AppData\Local\Temp\tmpjoh03jq_.js
+// include: C:\Users\thats\AppData\Local\Temp\tmpzpk7f54n.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: C:\Users\thats\AppData\Local\Temp\tmp5r_7djfe.js
+  // end include: C:\Users\thats\AppData\Local\Temp\tmpzpk7f54n.js
 
 
 var arguments_ = [];
@@ -7061,27 +7061,27 @@ function checkIncomingModuleAPI() {
 }
 var ASM_CONSTS = {
   136152: () => { if (document.activeElement.id === "screenKeyboard") document.getElementById("screenKeyboard").blur(); },  
- 136258: () => { var screenKeyboard = document.createElement("input"); document.body.appendChild(screenKeyboard); screenKeyboard.id = "screenKeyboard"; screenKeyboard.type = "text"; screenKeyboard.style = "position: absolute; top: -1000px; background-color: transparent; border: transparent; height:0px;"; screenKeyboard.maxlength = 256; screenKeyboard.autocomplete = "off"; screenKeyboard.autocorrect = "off"; screenKeyboard.autocapitalize = "off"; screenKeyboard.spellcheck = "false"; function handleScreenKeyboardReturn(event) { event.preventDefault(); Module.hideScreenKeyboard(); } document.getElementById("screenKeyboard").addEventListener('keydown', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyPress(event); } ); document.getElementById("screenKeyboard").addEventListener('keyup', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyRelease(event); } ); document.getElementById("screenKeyboard").addEventListener('keypress', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyTyped(event); } ); document.getElementById("screenKeyboard").addEventListener('focusout', handleScreenKeyboardReturn); window.addEventListener('resize', function() { Module.resize(); }); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('pointermove', Module.mouseMove); Module.canvas.addEventListener('pointerdown', Module.mousePress); Module.canvas.addEventListener('pointerup', Module.mouseRelease); Module.canvas.addEventListener('wheel', Module.mouseWheel); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress); Module.canvas.addEventListener('keyup', Module.keyRelease); Module.canvas.addEventListener('keypress', Module.keyTyped); Module.canvas.addEventListener('touchstart', Module.touchOn); Module.canvas.addEventListener('touchmove', Module.touchOn); Module.canvas.addEventListener('touchend', Module.touchOff); Module.canvas.addEventListener('touchcancel', Module.touchOff); },  
- 138606: () => { return window.devicePixelRatio },  
- 138637: () => { if (document.activeElement.id === "screenKeyboard") document.getElementById("screenKeyboard").blur(); },  
- 138743: () => { return Date.now() },  
- 138761: () => { requestAnimationFrame(Module.render) },  
- 138798: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
- 138872: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
- 138946: () => { requestAnimationFrame(Module.render) },  
- 138983: () => { return Date.now() },  
- 139001: () => { return Module.canvas.clientWidth },  
- 139034: () => { return Module.canvas.clientHeight },  
- 139068: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
- 139234: () => { return window.devicePixelRatio },  
- 139265: () => { return Module.canvas.clientWidth },  
- 139298: () => { return Module.canvas.clientHeight },  
- 139332: () => { return Module.canvas.width },  
- 139359: () => { return Module.canvas.height },  
- 139387: () => { return window.devicePixelRatio },  
- 139418: ($0) => { if (Module.canvas.setPointerCapture) Module.canvas.setPointerCapture($0); },  
- 139496: ($0) => { if (Module.canvas.releasePointerCapture ) Module.canvas.releasePointerCapture($0); },  
- 139583: () => { if (document.activeElement.id != "screenKeyboard") document.getElementById("screenKeyboard").focus(); }
+ 136258: () => { var screenKeyboard = document.createElement("input"); document.body.appendChild(screenKeyboard); screenKeyboard.id = "screenKeyboard"; screenKeyboard.type = "text"; screenKeyboard.style = "position: absolute; top: -1000px; background-color: transparent; border: transparent; height:0px;"; screenKeyboard.maxlength = 256; screenKeyboard.autocomplete = "off"; screenKeyboard.autocorrect = "off"; screenKeyboard.autocapitalize = "off"; screenKeyboard.spellcheck = "false"; function handleScreenKeyboardReturn(event) { event.preventDefault(); Module.hideScreenKeyboard(); } document.getElementById("screenKeyboard").addEventListener('keydown', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyPress(event); } ); document.getElementById("screenKeyboard").addEventListener('keyup', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyRelease(event); } ); document.getElementById("screenKeyboard").addEventListener('keypress', function(event) { if (event.keyCode === 13) handleScreenKeyboardReturn(event); else Module.keyTyped(event); } ); document.getElementById("screenKeyboard").addEventListener('focusout', handleScreenKeyboardReturn); window.addEventListener('resize', function() { Module.resize(); }); Module.canvas = document.getElementById("gl-canvas"); Module.canvas.addEventListener('contextmenu', function(event) {event.preventDefault();}); Module.canvas.addEventListener('pointermove', Module.mouseMove); Module.canvas.addEventListener('pointerdown', Module.mousePress); Module.canvas.addEventListener('pointerup', Module.mouseRelease); Module.canvas.addEventListener('wheel', Module.mouseWheel, { passive: false }); Module.canvas.addEventListener('keydown', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keyup', function(event) { if (event.keyCode === 9) {event.preventDefault();}}); Module.canvas.addEventListener('keydown', Module.keyPress); Module.canvas.addEventListener('keyup', Module.keyRelease); Module.canvas.addEventListener('keypress', Module.keyTyped); Module.canvas.addEventListener('touchstart', Module.touchOn, { passive: false }); Module.canvas.addEventListener('touchmove', Module.touchOn, { passive: false }); Module.canvas.addEventListener('touchend', Module.touchOff); Module.canvas.addEventListener('touchcancel', Module.touchOff); },  
+ 138666: () => { return window.devicePixelRatio },  
+ 138697: () => { if (document.activeElement.id === "screenKeyboard") document.getElementById("screenKeyboard").blur(); },  
+ 138803: () => { return Date.now() },  
+ 138821: () => { requestAnimationFrame(Module.render) },  
+ 138858: () => { alert("Error, unable to create webgl context. Rendering will fail!"); },  
+ 138932: () => { alert("Error, unable to make context current. Rendering will fail!"); },  
+ 139006: () => { requestAnimationFrame(Module.render) },  
+ 139043: () => { return Date.now() },  
+ 139061: () => { return Module.canvas.clientWidth },  
+ 139094: () => { return Module.canvas.clientHeight },  
+ 139128: () => { Module.canvas.width = Module.canvas.clientWidth * (window.devicePixelRatio || 1); Module.canvas.height = Module.canvas.clientHeight * (window.devicePixelRatio || 1); },  
+ 139294: () => { return window.devicePixelRatio },  
+ 139325: () => { return Module.canvas.clientWidth },  
+ 139358: () => { return Module.canvas.clientHeight },  
+ 139392: () => { return Module.canvas.width },  
+ 139419: () => { return Module.canvas.height },  
+ 139447: () => { return window.devicePixelRatio },  
+ 139478: ($0) => { if (Module.canvas.setPointerCapture) Module.canvas.setPointerCapture($0); },  
+ 139556: ($0) => { if (Module.canvas.releasePointerCapture ) Module.canvas.releasePointerCapture($0); },  
+ 139643: () => { if (document.activeElement.id != "screenKeyboard") document.getElementById("screenKeyboard").focus(); }
 };
 function upload(accept_types,callback,callback_data) { globalThis["open_file"] = function(e) { const file_reader = new FileReader(); file_reader.onload = (event) => { const uint8Arr = new Uint8Array(event.target.result); const data_ptr = Module["_malloc"](uint8Arr.length); const data_on_heap = new Uint8Array(Module["HEAPU8"].buffer, data_ptr, uint8Arr.length); data_on_heap.set(uint8Arr); Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], [event.target.filename, event.target.mime_type, data_on_heap.byteOffset, uint8Arr.length, callback, callback_data]); Module["_free"](data_ptr); }; file_reader.filename = e.target.files[0].name; file_reader.mime_type = e.target.files[0].type; file_reader.readAsArrayBuffer(e.target.files[0]); }; var file_selector = document.createElement('input'); file_selector.setAttribute('type', 'file'); file_selector.setAttribute('onchange', 'globalThis["open_file"](event)'); file_selector.addEventListener('cancel', () => { Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], ["", "", 0, 0, callback, callback_data]); }); file_selector.setAttribute('accept', UTF8ToString(accept_types)); var is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); if (is_safari) { var dialog = document.createElement('dialog'); dialog.setAttribute('id', 'EmJsFileDialog'); var desc = document.createElement('p'); desc.innerText = 'Please choose a file. Allowed extension(s): ' + UTF8ToString(accept_types); dialog.appendChild(desc); file_selector.setAttribute('onclick', 'var dg = document.getElementById("EmJsFileDialog"); dg.close(); dg.remove()'); dialog.appendChild(file_selector); document.body.append(dialog); dialog.showModal(); } else { file_selector.click(); } }
 function download(filename,mime_type,buffer,buffer_size) { var a = document.createElement('a'); a.download = UTF8ToString(filename); a.href = URL.createObjectURL(new Blob([new Uint8Array(Module["HEAPU8"].buffer, buffer, buffer_size)], {type: UTF8ToString(mime_type)})); a.click(); }
